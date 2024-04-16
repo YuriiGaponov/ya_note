@@ -95,7 +95,7 @@ class TestRoutes(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK,
                                  'Страница списка записей недоступна.')
 
-    def test_1redirect_edit_detail_delete_for_anonymous_client(self):
+    def test_redirect_edit_detail_delete_for_anonymous_client(self):
         """Переадресация страниц для анонимного пользователя."""
         login_url = reverse('users:login')
         urls = (

@@ -69,14 +69,17 @@ class TestCreateNote(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username='Пользователь')
-        cls.client = Client()
-        cls.client.force_login(cls.user)
+        cls.user_client = Client()
+        cls.user_client.force_login(cls.user)
         cls.note = Note.objects.create(
             title='Заголовок',
             text='Текст',
             slug='slug',
             author=cls.user
         )
+        cls.another_user = User.objects.create(username='Другой пользователь')
+        cls.another_user_client = Client()
+        cls.another_user_client.force_login(cls.another_user)
         cls.add_url = reverse('notes:add')
         cls.form_data = {
             'title': 'Другой заголовок',
@@ -86,7 +89,14 @@ class TestCreateNote(TestCase):
 
     def test_user_cant_create_several_notes_one_slug(self):
         """Нельзя создать несколько заметок с одинаковым slug."""
-        self.client.post(self.add_url, data=self.form_data)
+        self.user_client.post(self.add_url, data=self.form_data)
+        notes_count = Note.objects.count()
+        self.assertEqual(notes_count, 1,
+                         'slug должен быть уникальным для каждой заметки.')
+
+    def test_another_user_cant_create_several_notes_one_slug(self):
+        """Нельзя создать несколько заметок с одинаковым slug."""
+        self.another_user_client.post(self.add_url, data=self.form_data)
         notes_count = Note.objects.count()
         self.assertEqual(notes_count, 1,
                          'slug должен быть уникальным для каждой заметки.')

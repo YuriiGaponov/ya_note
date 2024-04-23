@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from notes.models import Note
@@ -15,6 +15,11 @@ class TestNoteList(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.author = User.objects.create(username='Автор')
+        cls.author_client = Client()
+        cls.author_client.force_login(cls.author)
+        cls.reader = User.objects.create(username='Читатель')
+        cls.reader_client = Client()
+        cls.reader_client.force_login(cls.reader)
         all_notes = [
             Note(
                 title=f'Заголовок {index}',
@@ -24,16 +29,30 @@ class TestNoteList(TestCase):
                  ) for index in range(10)
          ]
         Note.objects.bulk_create(all_notes)
+        cls.note = Note.objects.create(
+            title='Заголовок',
+            text='Текст',
+            slug='slug',
+            author=cls.author
+        )
 
     def test_order_notes(self):
         """Порядок вывода записей."""
-        self.client.force_login(self.author)
-        response = self.client.get(self.LIST_URL)
+        response = self.author_client.get(self.LIST_URL)
         object_list = response.context['object_list']
         all_notes = [note.pk for note in object_list]
         sorted_notes = sorted(all_notes)
         self.assertEqual(sorted_notes, all_notes,
                          'Список записей выводится неправильно.')
+
+    def test_notes_list_for_different_users(self):
+        """
+        В список заметок одного пользователя
+        не попадают заметки другого пользователя.
+        """
+        response = self.reader_client.get(self.LIST_URL)
+        object_list = response.context['object_list']
+        self.assertNotIn(self.note, object_list)
 
 
 class TestNoteAddEdit(TestCase):

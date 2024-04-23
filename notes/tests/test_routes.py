@@ -44,17 +44,6 @@ class TestRoutes(TestCase):
                     'Страница недоступна.'
                 )
 
-    def test_create_note_page(self):
-        """Создание записи."""
-        self.client.force_login(self.user)
-        Note.objects.create(
-            title='Заголовок1',
-            text='Текст1',
-            author=self.user
-        )
-        self.assertEqual(Note.objects.count(), 2,
-                         'Новая запись не создается')
-
     def test_note_detail_edit_delete_pages_availability(self):
         """
         Доступность страницы просмотра, удаления, редактирования записи

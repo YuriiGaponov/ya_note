@@ -26,8 +26,8 @@ class TestNoteList(TestCase):
                 text=f'Текст {index}',
                 slug=f'slug{index}',
                 author=cls.author
-                 ) for index in range(10)
-         ]
+            ) for index in range(10)
+        ]
         Note.objects.bulk_create(all_notes)
         cls.note = Note.objects.create(
             title='Заголовок',

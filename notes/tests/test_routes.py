@@ -69,11 +69,12 @@ class TestRoutes(TestCase):
                         response.status_code, status,
                         ('Другой пользователь может'
                          'просматривать, изменять и удалять записи.')
-                        )
+                    )
 
     def test_note_list_success_page_availability(self):
         """
-        Доступность страниц списка, подтверждения успешного создания записей.
+        Доступность страниц списка,
+        подтверждения успешного создания записей.
         """
         urls = ('notes:list', 'notes:success',)
         for name in urls:
